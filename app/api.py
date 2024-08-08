@@ -18,9 +18,6 @@ DATABASE_PATH = os.path.join(DATA_DIR, "labeling_data.db")
 # Initialize FastAPI
 app = FastAPI(title="Labeling Data Export API", version="1.0.0")
 
-# Connect to the DuckDB database
-conn = duckdb.connect(DATABASE_PATH)
-
 
 @app.get("/export")
 async def export_data(
@@ -55,7 +52,10 @@ async def export_data(
             query += f" AND batch_name = '{batch_name}'"
 
         logger.info(f"Executing query: {query}")
-        df = conn.execute(query).fetchdf()
+
+        # Open the database connection in a context manager
+        with duckdb.connect(DATABASE_PATH, read_only=True) as conn:
+            df = conn.execute(query).fetchdf()
 
         if df.empty:
             raise HTTPException(

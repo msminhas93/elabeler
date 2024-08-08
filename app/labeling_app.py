@@ -25,34 +25,34 @@ if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
     logger.info(f"Created data directory at {DATA_DIR}")
 
-# Check if the database file exists, and reinitialize if not
-if not os.path.exists(DATABASE_PATH):
-    logger.info("Database file not found. Reinitializing the database.")
-    conn = duckdb.connect(DATABASE_PATH)
-    conn.execute("""
-    CREATE TABLE IF NOT EXISTS labels (
-        text STRING,
-        label STRING,
-        timestamp TIMESTAMP,
-        batch_id STRING,
-        batch_name STRING
-    )
-    """)
-else:
-    conn = duckdb.connect(DATABASE_PATH)
+
+# Function to initialize the database
+def initialize_database():
+    with duckdb.connect(DATABASE_PATH) as conn:
+        conn.execute("""
+        CREATE TABLE IF NOT EXISTS labels (
+            text STRING,
+            label STRING,
+            timestamp TIMESTAMP,
+            batch_id STRING,
+            batch_name STRING
+        )
+        """)
+        logger.info("Database initialized successfully.")
 
 
 # Function to save labels to the database
 def save_labels(labels, batch_id, batch_name):
     try:
-        timestamp = datetime.now()
-        for label in labels:
-            label["timestamp"] = timestamp
-            label["batch_id"] = batch_id
-            label["batch_name"] = batch_name
-        df = pl.DataFrame(labels)
-        conn.execute("INSERT INTO labels SELECT * FROM df")
-        logger.info("Labels saved successfully.")
+        with duckdb.connect(DATABASE_PATH) as conn:
+            timestamp = datetime.now()
+            for label in labels:
+                label["timestamp"] = timestamp
+                label["batch_id"] = batch_id
+                label["batch_name"] = batch_name
+            df = pl.DataFrame(labels)
+            conn.execute("INSERT INTO labels SELECT * FROM df")
+            logger.info("Labels saved successfully.")
     except Exception as e:
         logger.error(f"Error saving labels: {e}")
 
@@ -76,8 +76,9 @@ def load_data_from_csv(uploaded_file):
 # Function to fetch the latest 500 labels from the database
 def fetch_latest_labels(limit=500):
     try:
-        query = f"SELECT text, label, timestamp, batch_id, batch_name FROM labels ORDER BY timestamp DESC LIMIT {limit}"
-        return conn.execute(query).fetchdf()
+        with duckdb.connect(DATABASE_PATH, read_only=True) as conn:
+            query = f"SELECT text, label, timestamp, batch_id, batch_name FROM labels ORDER BY timestamp DESC LIMIT {limit}"
+            return conn.execute(query).fetchdf()
     except Exception as e:
         logger.error(f"Error fetching labels: {e}")
         return pl.DataFrame()
@@ -87,6 +88,9 @@ def fetch_latest_labels(limit=500):
 def validate_batch_name(name):
     return re.match(r"^[a-z0-9_-]+$", name) is not None
 
+
+# Initialize the database
+initialize_database()
 
 # Initialize session state
 if "labels" not in st.session_state:
@@ -124,7 +128,6 @@ uploaded_file = st.file_uploader(
 
 # Load data
 if uploaded_file:
-    # Reset state when a new file is uploaded
     data = load_data_from_csv(uploaded_file)
 else:
     data = pl.DataFrame()
