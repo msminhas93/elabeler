@@ -1,0 +1,12 @@
+# Application dependencies
+fastapi
+uvicorn
+polars
+duckdb
+streamlit
+altair
+python-dotenv
+
+# Testing dependencies
+pytest
+httpx
