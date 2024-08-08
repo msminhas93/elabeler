@@ -203,7 +203,7 @@ if not data.is_empty():
         "Export", help="Export the labeled data in the selected format"
     ):
         saved_labels = fetch_latest_labels()
-        export_data = saved_labels.to_pandas()  # Convert to pandas for export
+        export_data = saved_labels
         if export_format == "CSV":
             st.download_button(
                 "Download CSV",
