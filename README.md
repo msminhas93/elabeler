@@ -32,8 +32,8 @@ elabeler is an NLP text labeling tool that enables  easy labeling of text data. 
 ### Setup and Installation
 1. Clone the Repository: 
    ```
-   git clone https://github.com/yourusername/your-repo.git
-   cd your-repo
+   git clone https://github.com/msminhas93/elabeler.git
+   cd elabeler
    ```
 2. Build and Run with Docker Compose:
    ```
@@ -44,6 +44,7 @@ elabeler is an NLP text labeling tool that enables  easy labeling of text data. 
    - FastAPI app: http://localhost:8000
 
 ### Usage
+
 #### Streamlit App
 - Upload CSV: Upload a CSV file containing text data.
 - Label Texts: Use the interface to label each text entry.
@@ -65,17 +66,18 @@ curl "http://localhost:8000/export?output_format=json"
 ```
 
 ### Testing
-1. Install Testing Dependencies:
-Ensure pytest and httpx are installed:
-```
-pip install pytest httpx
-```s
+1. Install Testing Dependencies: 
+   
+   Ensure pytest and httpx are installed:
+   ```
+   pip install pytest httpx
+   ```
 ### Run Tests:
-2. Execute the tests using pytest:
+1. Execute the tests using pytest:
 
-```
-pytest tests/
-```
+   ```
+   pytest tests/
+   ```
 
 
 ### Contributing
