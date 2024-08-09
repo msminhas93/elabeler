@@ -6,6 +6,8 @@ elabeler is an NLP text labeling tool that enables  easy labeling of text data. 
 - Single File Upload: Users can upload one CSV file at a time, ensuring a clean and organized labeling process.
 - Export Options: Export labeled data in multiple formats, including CSV, JSON, and Parquet.
 
+![alt text](images/elabeler.png)
+
 ### Directory Structure
 
 ```
